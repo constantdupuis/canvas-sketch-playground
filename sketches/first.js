@@ -1,5 +1,4 @@
 const canvasSketch = require('canvas-sketch');
-const random = require('canvas-sketch-util/random');
 const rand = require('canvas-sketch-util/random');
 
 class Particle {
@@ -18,9 +17,48 @@ class Particle {
     this.normalized_life = 1.0;
   }
 
+  update()
+  {
+    if( dead) return;
+    this.update(1.0);
+  }
+
+  update( deltaTime )
+  {
+    if( dead) return;
+    this.velx = this.accx * deltaTime;
+    this.vely = this.accy * deltaTime;
+    this.posx += this.velx;
+    this.posy += this.vely;
+    updateLife();
+  }
+
+  isDead() 
+  {
+    return this.dead;
+  }
+
+  life()
+  {
+    return this.life;
+  }
+
+  resurect( newLife)
+  {
+    this.start_life = newLife;
+    this.life = newLife;
+    if( newLife > 0 ) dead = false;
+  }
+
+  updateLife()
+  {
+    life--;
+    if( life == 0) dead = true;
+    this.normalized_life = this.life/this.start_life;
+  }
+
 
 }
-
 
 const settings = {
   dimensions: 'A4',
@@ -29,18 +67,30 @@ const settings = {
   animate : true
 };
 
-const sketch = () => {
-  return ({ context: ctx, width, height, time }) => {
+const sketch = ({context: ctx, canvasWidth, canvasHeight}) => {
+
+  //console.log(`sketch::init width ${canvasWidth}x${canvasHeight}` );
+
+  const pcount = 200;
+  const particles = [];
+
+  for( let pi = 0; pi < pcount; pi++)
+  {
+    particles.push( new Particle( canvasWidth * rand.value(), canvasHeight * rand.value()));
+  }
+
+  const rows = 10;
+  const cols = 10;
+  const marginx = canvasWidth * 0.05;
+  const marginy = canvasHeight * 0.05;
+
+  const cellw = (canvasWidth - 2 * marginx) / cols;
+  const cellh = (canvasHeight - 2 * marginy) / rows;
+
+  return ({ context: ctx, canvasWidth, canvasHeight, time }) => {
+
     ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, width, height);
-
-    const rows = 10;
-    const cols = 10;
-    const marginx = width * 0.05;
-    const marginy = height * 0.05;
-
-    const cellw = (width - 2 * marginx) / cols;
-    const cellh = (height - 2 * marginy) / rows;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     ctx.strokeStyle= "#000";
     
@@ -51,7 +101,7 @@ const sketch = () => {
         
         ctx.translate( marginx + x * cellw, marginy + y * cellh );
         ctx.beginPath();
-        let n = random.noise3D(x , y, time * 2, 0.1);
+        let n = rand.noise3D(x , y, time * 2, 0.1);
         n = n * 0.5 + 0.5;
         ctx.lineWidth = 100 * n;
         ctx.rect(0,0, cellw * 0.8, cellh * 0.8);
@@ -59,6 +109,7 @@ const sketch = () => {
 
         ctx.restore();
       }
+    
   };
 };
 
