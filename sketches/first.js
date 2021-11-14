@@ -53,16 +53,26 @@ class Particle {
     this.life = newLife;
     if (newLife > 0) dead = false;
   }
-
+ 
 }
+
+
 
 const settings = {
   dimensions: 'A4',
   pixelsPerInch: 300,
   orientation: 'landscape',
-  animate: false
+  animate: true,
 };
 
+const PARAMS = {
+  bg_color: '#fff',
+  pen_color: '#00ff0080',
+  animate : false,
+  prev_animate : false,
+  clear_bg: false,
+  frame_count : 0
+};
 
 
 const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
@@ -84,20 +94,31 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
   const cellw = (canvasWidth - 2 * marginx) / cols;
   const cellh = (canvasHeight - 2 * marginy) / rows;
 
-  ctx.fillStyle = 'white';
+  ctx.fillStyle = PARAMS.bg_color;
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
   ctx.strokeStyle = "#000";
   ctx.fillStyle = '#00ff0080';
 
-  return ({ context: ctx, canvasWidth, canvasHeight, time }) => {
+  return ({ context: ctx, canvasWidth, canvasHeight, time, frame }) => {
+
+    if( PARAMS.clear_bg)
+    {
+      PARAMS.clear_bg = false;
+      ctx.fillStyle = PARAMS.bg_color;
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    }
+
+    if( !PARAMS.animate) return;
+
+    PARAMS.frame_count = frame;
 
     for (let pi = 0; pi < pcount; pi++) {
       let p = particles[pi];
 
       //console.log(`Particle [${pi}] x ${p.posx} y ${p.posy}`);
-      ctx.fillStyle = '#00000005';
-      ctx.fillRect(p.posx, p.posy, 5, 5);
+      ctx.fillStyle = PARAMS.pen_color;
+      ctx.fillRect(p.posx, p.posy, 2, 2);
 
       let dir = rand.noise2D(p.posx, p.posy, 0.0005);
       //console.log(`Noise dir ${dir}`);
@@ -136,7 +157,28 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
 const createPane = () => {
 const pane = new Tweakpane.Pane();
 let folderCanvas = pane.addFolder({title : 'Canvas'});
+folderCanvas.addInput(PARAMS, 'bg_color');
+folderCanvas.addInput(PARAMS, 'pen_color');
+
+PARAMS.playing = settings.playing;
+const animate = folderCanvas.addInput(PARAMS, 'animate');
+// animate.on('change', (ev)=> {
+//   if( ev.value != PARAMS.prev_animate)
+//   {
+//     if( ev.value == false) return;
+//     //console.log(``);
+//     PARAMS.clear_bg = true;
+//     PARAMS.prev_animate = ev.value;  
+//   }
+// });
+const btnClearBg = pane.addButton({title:'Clear', label:'Background'});
+btnClearBg.on('click', ()=>{
+  PARAMS.clear_bg = true;
+});
+
+folderCanvas.addMonitor(PARAMS, 'frame_count');
 };
 
 createPane();
+
 canvasSketch(sketch, settings);
