@@ -67,7 +67,8 @@ const settings = {
 
 const PARAMS = {
   bg_color: '#fff',
-  pen_color: '#00ff0080',
+  pen_color: '#00ff0080', 
+  pen_color_02: '#00ff0080',
   animate : false,
   prev_animate : false,
   clear_bg: false,
@@ -99,6 +100,7 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
 
   ctx.strokeStyle = "#000";
   ctx.fillStyle = '#00ff0080';
+  rand.setSeed(127);
 
   return ({ context: ctx, canvasWidth, canvasHeight, time, frame }) => {
 
@@ -159,6 +161,7 @@ const pane = new Tweakpane.Pane();
 let folderCanvas = pane.addFolder({title : 'Canvas'});
 folderCanvas.addInput(PARAMS, 'bg_color');
 folderCanvas.addInput(PARAMS, 'pen_color');
+folderCanvas.addInput(PARAMS, 'pen_color_02');
 
 PARAMS.playing = settings.playing;
 const animate = folderCanvas.addInput(PARAMS, 'animate');
