@@ -2,6 +2,8 @@ const canvasSketch = require('canvas-sketch');
 const math = require('canvas-sketch-util/math');
 const rand = require('canvas-sketch-util/random');
 const Tweakpane = require("tweakpane");
+const TweakpaneThumbnailListPlugin = require('tweakpane-plugin-thumbnail-list');
+
 
 class Particle {
   constructor(x, y) {
@@ -72,7 +74,8 @@ const PARAMS = {
   animate : false,
   prev_animate : false,
   clear_bg: false,
-  frame_count : 0
+  frame_count : 0,
+  gradiant: '0'
 };
 
 
@@ -157,29 +160,41 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
 };
 
 const createPane = () => {
-const pane = new Tweakpane.Pane();
-let folderCanvas = pane.addFolder({title : 'Canvas'});
-folderCanvas.addInput(PARAMS, 'bg_color');
-folderCanvas.addInput(PARAMS, 'pen_color');
-folderCanvas.addInput(PARAMS, 'pen_color_02');
+  const pane = new Tweakpane.Pane();
+  pane.registerPlugin(TweakpaneThumbnailListPlugin);
 
-PARAMS.playing = settings.playing;
-const animate = folderCanvas.addInput(PARAMS, 'animate');
-// animate.on('change', (ev)=> {
-//   if( ev.value != PARAMS.prev_animate)
-//   {
-//     if( ev.value == false) return;
-//     //console.log(``);
-//     PARAMS.clear_bg = true;
-//     PARAMS.prev_animate = ev.value;  
-//   }
-// });
-const btnClearBg = pane.addButton({title:'Clear', label:'Background'});
-btnClearBg.on('click', ()=>{
-  PARAMS.clear_bg = true;
-});
+  let folderCanvas = pane.addFolder({title : 'Canvas'});
+  folderCanvas.addInput(PARAMS, 'bg_color');
+  folderCanvas.addInput(PARAMS, 'pen_color');
+  folderCanvas.addInput(PARAMS, 'pen_color_02');
 
-folderCanvas.addMonitor(PARAMS, 'frame_count');
+  PARAMS.playing = settings.playing;
+  const animate = folderCanvas.addInput(PARAMS, 'animate');
+  // animate.on('change', (ev)=> {
+  //   if( ev.value != PARAMS.prev_animate)
+  //   {
+  //     if( ev.value == false) return;
+  //     //console.log(``);
+  //     PARAMS.clear_bg = true;
+  //     PARAMS.prev_animate = ev.value;  
+  //   }
+  // });
+  const btnClearBg = pane.addButton({title:'Clear', label:'Background'});
+  btnClearBg.on('click', ()=>{
+    PARAMS.clear_bg = true;
+  });
+
+  folderCanvas.addMonitor(PARAMS, 'frame_count');
+
+  pane.addInput(PARAMS, 'gradiant',{
+    view :'thumbnail-list',
+    options:[
+      {text : '01', value: '0', src:'./gradiants/00.png'},
+      {text : '02', value: '1', src:'./gradiants/01.png'},
+      {text : '03', value: '2', src:'./gradiants/02.png'}
+    ]
+  });
+
 };
 
 createPane();
