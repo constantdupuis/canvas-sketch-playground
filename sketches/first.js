@@ -58,7 +58,21 @@ class Particle {
  
 }
 
+const gradiantCanvas = document.createElement('canvas');
+const gradiantCtx = gradiantCanvas.getContext('2d');
+let gradiantPixels;
+let gradiantPixelsData;
+let gradiantLoaded = false;
+const gradiantImg = new Image();
 
+gradiantImg.onload = () =>{
+  console.log(`Gradient loaded`);
+  gradiantLoaded = true;
+  gradiantCtx.drawImage( gradiantImg, 0, 0);
+  gradiantPixels = gradiantCtx.getImageData(0, 0, gradiantImg.width, gradiantImg.height);
+};
+
+gradiantImg.src = 'gradiants/01.png';
 
 const settings = {
   dimensions: 'A4',
@@ -116,6 +130,9 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
       ctx.fillStyle = PARAMS.bg_color;
       ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     }
+
+    if( gradiantLoaded)
+        ctx.putImageData(gradiantPixels, 0, 0);
 
     if( !PARAMS.animate) return;
 
