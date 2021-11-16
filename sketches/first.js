@@ -70,12 +70,12 @@ const settings = {
 const PARAMS = {
   bg_color: '#fff',
   pen_color: '#00ff0080', 
-  pen_color_02: '#00ff0080',
+  use_gradiants : false,
+  gradiants : '0',
   animate : false,
   prev_animate : false,
   clear_bg: false,
-  frame_count : 0,
-  gradiant: '0'
+  frame_count : 0
 };
 
 
@@ -165,28 +165,14 @@ const createPane = () => {
 
   let folderCanvas = pane.addFolder({title : 'Canvas'});
   folderCanvas.addInput(PARAMS, 'bg_color');
-  folderCanvas.addInput(PARAMS, 'pen_color');
-  folderCanvas.addInput(PARAMS, 'pen_color_02');
-
-  PARAMS.playing = settings.playing;
-  const animate = folderCanvas.addInput(PARAMS, 'animate');
-  // animate.on('change', (ev)=> {
-  //   if( ev.value != PARAMS.prev_animate)
-  //   {
-  //     if( ev.value == false) return;
-  //     //console.log(``);
-  //     PARAMS.clear_bg = true;
-  //     PARAMS.prev_animate = ev.value;  
-  //   }
-  // });
-  const btnClearBg = pane.addButton({title:'Clear', label:'Background'});
+  const btnClearBg = folderCanvas.addButton({title:'clear', label:'background'});
   btnClearBg.on('click', ()=>{
     PARAMS.clear_bg = true;
   });
+  folderCanvas.addInput(PARAMS, 'pen_color');
+  folderCanvas.addInput(PARAMS, 'use_gradiants');
 
-  folderCanvas.addMonitor(PARAMS, 'frame_count');
-
-  pane.addInput(PARAMS, 'gradiant',{
+  folderCanvas.addInput(PARAMS, 'gradiants',{
     view :'thumbnail-list',
     options:[
       {text : '01', value: '0', src:'./gradiants/00.png'},
@@ -195,6 +181,12 @@ const createPane = () => {
     ]
   });
 
+  let folderAnim = pane.addFolder({title : 'Animation'});
+
+  PARAMS.playing = settings.playing;
+  const animate = folderAnim.addInput(PARAMS, 'animate');
+
+  folderAnim.addMonitor(PARAMS, 'frame_count');
 };
 
 createPane();
