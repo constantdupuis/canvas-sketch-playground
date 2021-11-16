@@ -68,12 +68,15 @@ const settings = {
 };
 
 const PARAMS = {
-  bg_color: '#fff',
-  pen_color: '#00ff0080', 
+  bg_color: '#DDBEA9',
+
+  pen_color: '#6B705C20', 
   use_gradiants : false,
   gradiants : '0',
+  pen_speed : 4.0,
+  rand_seed : 127,
+  
   animate : false,
-  prev_animate : false,
   clear_bg: false,
   frame_count : 0
 };
@@ -90,20 +93,20 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
     particles.push(new Particle(canvasWidth * rand.value(), canvasHeight * rand.value()));
   }
 
-  const rows = 10;
-  const cols = 10;
-  const marginx = canvasWidth * 0.05;
-  const marginy = canvasHeight * 0.05;
+  // const rows = 10;
+  // const cols = 10;
+  // const marginx = canvasWidth * 0.05;
+  // const marginy = canvasHeight * 0.05;
 
-  const cellw = (canvasWidth - 2 * marginx) / cols;
-  const cellh = (canvasHeight - 2 * marginy) / rows;
+  // const cellw = (canvasWidth - 2 * marginx) / cols;
+  // const cellh = (canvasHeight - 2 * marginy) / rows;
 
   ctx.fillStyle = PARAMS.bg_color;
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
   ctx.strokeStyle = "#000";
   ctx.fillStyle = '#00ff0080';
-  rand.setSeed(127);
+  rand.setSeed(PARAMS.rand_seed);
 
   return ({ context: ctx, canvasWidth, canvasHeight, time, frame }) => {
 
@@ -127,8 +130,8 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
 
       let dir = rand.noise2D(p.posx, p.posy, 0.0005);
       //console.log(`Noise dir ${dir}`);
-      p.velx = Math.sin(dir * Math.PI) * 4.0;
-      p.vely = Math.cos(dir * Math.PI) * 4.0;
+      p.velx = Math.sin(dir * Math.PI) * PARAMS.pen_speed;
+      p.vely = Math.cos(dir * Math.PI) * PARAMS.pen_speed;
       //console.log(`p.velx ${p.velx}`);
       p.update();
 
@@ -164,15 +167,25 @@ const createPane = () => {
   pane.registerPlugin(TweakpaneThumbnailListPlugin);
 
   let folderCanvas = pane.addFolder({title : 'Canvas'});
+
   folderCanvas.addInput(PARAMS, 'bg_color');
   const btnClearBg = folderCanvas.addButton({title:'clear', label:'background'});
   btnClearBg.on('click', ()=>{
     PARAMS.clear_bg = true;
   });
-  folderCanvas.addInput(PARAMS, 'pen_color');
-  folderCanvas.addInput(PARAMS, 'use_gradiants');
 
-  folderCanvas.addInput(PARAMS, 'gradiants',{
+  let folderDrawer = pane.addFolder({title : 'Drawer'});
+
+  folderDrawer.addInput(PARAMS, 'pen_color');
+  folderDrawer.addInput(PARAMS, 'pen_speed', {min:0.5, max:10.0});
+  const rand_seed = folderDrawer.addInput(PARAMS, 'rand_seed');
+  rand_seed.on('change', (ev) => {
+    rand.setSeed(ev.value);
+  })
+
+  folderDrawer.addInput(PARAMS, 'use_gradiants');
+
+  folderDrawer.addInput(PARAMS, 'gradiants',{
     view :'thumbnail-list',
     options:[
       {text : '01', value: '0', src:'./gradiants/00.png'},
