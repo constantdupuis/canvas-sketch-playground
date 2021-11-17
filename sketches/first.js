@@ -68,11 +68,27 @@ const gradiantImg = new Image();
 gradiantImg.onload = () =>{
   console.log(`Gradient loaded`);
   gradiantLoaded = true;
+  gradiantCanvas.width = gradiantImg.width;
+  gradiantCanvas.height = gradiantImg.height;
   gradiantCtx.drawImage( gradiantImg, 0, 0);
   gradiantPixels = gradiantCtx.getImageData(0, 0, gradiantImg.width, gradiantImg.height);
 };
-
 gradiantImg.src = 'gradiants/01.png';
+
+const pickGradiantColor = (where) => {
+  if( where < 0.0 || where > 1.0) return;
+  if( gradiantLoaded )
+  {
+    const where_to_pick_x = Math.floor(gradiantImg.width * where);
+    const where_to_pick_index = ((gradiantImg.width * 4) * Math.Floor(gradiantImg.height / 2)) + (where_to_pick_x * 4);
+    const htmlColor = String.Format(CultureInfo.InvariantCulture, 
+      "rgba({0},{1},{2},{3})", 
+        gradiantPixels.data[where_to_pick_index], 
+        gradiantPixels.data[where_to_pick_index+1], 
+        gradiantPixels.data[where_to_pick_index+2], 
+        gradiantPixels.data[where_to_pick_index+3] / 255);
+  }
+}
 
 const settings = {
   dimensions: 'A4',
@@ -220,5 +236,4 @@ const createPane = () => {
 };
 
 createPane();
-
 canvasSketch(sketch, settings);
