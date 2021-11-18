@@ -1,5 +1,7 @@
-import { Particle, Vec2 } from './tslib/Particles';
+//import { Particle, Vec2 } from '../tslib/Particles';
+import { Particle } from './tslib/Particles';
 const canvasSketch = require('canvas-sketch');
+//const Particle = require('../tslib/Particles');
 
 
 const settings = {
@@ -17,13 +19,13 @@ interface Props {
 }
 
 let particle_nbr = 500;
-let particles :Array<Particle> = new Array<Particle>();
+let particles :Array<Particle.Particle> = new Array<Particle.Particle>();
 
 const sketch = ({ context, width, height, playhead }: Props) => {
 
   for( let i = 10; i < particle_nbr; i++)
   {
-    particles.push( new Particle( new Vec2(Math.random() * width, Math.random() * height)) );
+    particles.push( new Particle( new Particle.Vec2(Math.random() * width, Math.random() * height)) );
   }
 
   return ({ context, width, height, playhead }: Props) => {
