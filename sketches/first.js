@@ -19,6 +19,7 @@ class Particle {
     this.start_life = Number.MAX_SAFE_INTEGER;
     this.dead = false;
     this.normalized_life = 1.0;
+    this.color = "pink";
   }
 
   update() {
@@ -53,7 +54,7 @@ class Particle {
   resurect(newLife) {
     this.start_life = newLife;
     this.life = newLife;
-    if (newLife > 0) dead = false;
+    if (newLife > 0) this.dead = false;
   }
  
 }
@@ -65,6 +66,17 @@ let gradiantPixelsData;
 let gradiantLoaded = false;
 const gradiantImg = new Image();
 
+const pcount = 10000;
+const particles = [];
+
+const resetParticles = () => {
+  for (let pi = 0; pi < pcount; pi++) {
+    let p = particles[pi];
+    //p.resurect(Number.MAX_SAFE_INTEGER);
+    p.color = pickGradiantColor( Math.random(), 0.2);
+  }
+}
+
 gradiantImg.onload = () =>{
   console.log(`Gradient loaded`);
   gradiantLoaded = true;
@@ -73,21 +85,17 @@ gradiantImg.onload = () =>{
   gradiantCtx.drawImage( gradiantImg, 0, 0);
   gradiantPixels = gradiantCtx.getImageData(0, 0, gradiantImg.width, gradiantImg.height);
 };
-gradiantImg.src = 'gradiants/01.png';
+console.log(`Load gradiant`);
+gradiantImg.src = 'gradiants/00.png';
 
-const pickGradiantColor = (where) => {
+const pickGradiantColor = (where, alpha) => {
   if( where < 0.0 || where > 1.0) return 'pink';
   if( gradiantLoaded )
   {
     const where_to_pick_x = Math.floor(gradiantImg.width * where);
-    const where_to_pick_index = ((gradiantImg.width * 4) * Math.Floor(gradiantImg.height / 2)) + (where_to_pick_x * 4);
-    const htmlColor = String.Format(CultureInfo.InvariantCulture, 
-      "rgba({0},{1},{2},{3})", 
-        gradiantPixels.data[where_to_pick_index], 
-        gradiantPixels.data[where_to_pick_index+1], 
-        gradiantPixels.data[where_to_pick_index+2], 
-        gradiantPixels.data[where_to_pick_index+3] / 255);
-        return htmlColor;
+    const where_to_pick_index = ((gradiantImg.width * 4) * Math.floor(gradiantImg.height / 2)) + (where_to_pick_x * 4);
+    const htmlColor = `rgba(${gradiantPixels.data[where_to_pick_index]},${gradiantPixels.data[where_to_pick_index+1]},${gradiantPixels.data[where_to_pick_index+2]},${alpha})`; 
+    return htmlColor;
   }
   return 'pink';
 }
@@ -103,7 +111,7 @@ const PARAMS = {
   bg_color: '#DDBEA9',
 
   pen_color: '#6B705C20', 
-  use_gradiants : false,
+  use_gradiants : true,
   gradiants : '0',
   pen_speed : 4.0,
   rand_seed : 127,
@@ -118,11 +126,11 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
 
   //console.log(`sketch::init width ${canvasWidth}x${canvasHeight}` );
 
-  const pcount = 10000;
-  const particles = [];
-
+  console.log(`Generate particles`);
   for (let pi = 0; pi < pcount; pi++) {
-    particles.push(new Particle(canvasWidth * rand.value(), canvasHeight * rand.value()));
+    let p = new Particle(canvasWidth * rand.value(), canvasHeight * rand.value());
+    p.color = pickGradiantColor( Math.random(), 1.0);
+    particles.push(p);
   }
 
   // const rows = 10;
@@ -149,9 +157,6 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
       ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     }
 
-    if( gradiantLoaded)
-        ctx.putImageData(gradiantPixels, 0, 0);
-
     if( !PARAMS.animate) return;
 
     PARAMS.frame_count = frame;
@@ -160,15 +165,7 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
       let p = particles[pi];
 
       //console.log(`Particle [${pi}] x ${p.posx} y ${p.posy}`);
-      
-      if( PARAMS.use_gradiants)
-      {
-        ctx.fillStyle = pickGradiantColor( Math.random());
-      }
-      else
-      {
-        ctx.fillStyle = PARAMS.pen_color;
-      }
+      ctx.fillStyle = p.color;
       
       ctx.fillRect(p.posx, p.posy, 2, 2);
 
@@ -218,6 +215,12 @@ const createPane = () => {
     PARAMS.clear_bg = true;
   });
 
+  folderCanvas.addButton({title:'reset', label:'particles'}).on('click', ()=>{
+    resetParticles();
+  });
+
+  
+
   let folderDrawer = pane.addFolder({title : 'Drawer'});
 
   folderDrawer.addInput(PARAMS, 'pen_color');
@@ -227,16 +230,16 @@ const createPane = () => {
     rand.setSeed(ev.value);
   })
 
-  folderDrawer.addInput(PARAMS, 'use_gradiants');
+  // folderDrawer.addInput(PARAMS, 'use_gradiants');
 
-  folderDrawer.addInput(PARAMS, 'gradiants',{
-    view :'thumbnail-list',
-    options:[
-      {text : '01', value: '0', src:'./gradiants/00.png'},
-      {text : '02', value: '1', src:'./gradiants/01.png'},
-      {text : '03', value: '2', src:'./gradiants/02.png'}
-    ]
-  });
+  // folderDrawer.addInput(PARAMS, 'gradiants',{
+  //   view :'thumbnail-list',
+  //   options:[
+  //     {text : '01', value: '0', src:'./gradiants/00.png'},
+  //     {text : '02', value: '1', src:'./gradiants/01.png'},
+  //     {text : '03', value: '2', src:'./gradiants/02.png'}
+  //   ]
+  // });
 
   let folderAnim = pane.addFolder({title : 'Animation'});
 
