@@ -76,7 +76,7 @@ gradiantImg.onload = () =>{
 gradiantImg.src = 'gradiants/01.png';
 
 const pickGradiantColor = (where) => {
-  if( where < 0.0 || where > 1.0) return;
+  if( where < 0.0 || where > 1.0) return 'pink';
   if( gradiantLoaded )
   {
     const where_to_pick_x = Math.floor(gradiantImg.width * where);
@@ -87,7 +87,9 @@ const pickGradiantColor = (where) => {
         gradiantPixels.data[where_to_pick_index+1], 
         gradiantPixels.data[where_to_pick_index+2], 
         gradiantPixels.data[where_to_pick_index+3] / 255);
+        return htmlColor;
   }
+  return 'pink';
 }
 
 const settings = {
@@ -158,7 +160,16 @@ const sketch = ({ context: ctx, canvasWidth, canvasHeight }) => {
       let p = particles[pi];
 
       //console.log(`Particle [${pi}] x ${p.posx} y ${p.posy}`);
-      ctx.fillStyle = PARAMS.pen_color;
+      
+      if( PARAMS.use_gradiants)
+      {
+        ctx.fillStyle = pickGradiantColor( Math.random());
+      }
+      else
+      {
+        ctx.fillStyle = PARAMS.pen_color;
+      }
+      
       ctx.fillRect(p.posx, p.posy, 2, 2);
 
       let dir = rand.noise2D(p.posx, p.posy, 0.0005);

@@ -1,6 +1,6 @@
 # CC
 
-## Resourcers
+## Resourses
 
 ### Gradiants generator
 
