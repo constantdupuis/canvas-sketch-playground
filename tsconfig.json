@@ -1,3 +1,12 @@
 {
-    "include": ["tslib/**/*"]
+    "compilerOptions": {
+        "target": "es5",
+        "module": "CommonJS",
+        "allowJs" : true,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true
+      },
+      "include": ["./tslib/*"]
 }

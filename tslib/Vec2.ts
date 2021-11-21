@@ -1,4 +1,4 @@
-export class Vec2 {
+class Vec2 {
     x: number;
     y: number;
 
@@ -41,36 +41,4 @@ export class Vec2 {
     }
 }
 
-export class Particle {
-    pos : Vec2;
-    acc : Vec2;
-    vel : Vec2;
-    life : number;
-    start_life: number;
-
-    constructor( pos : Vec2)
-    {
-        this.pos = pos;
-        this.life = this.start_life = Number.MAX_SAFE_INTEGER;
-    }
-
-    update( deltaTime? : number) : void
-    {
-        if( this.life <= 0) return;
-
-        let dTime : number = 1.0;
-        if( deltaTime !== undefined)
-        {
-            dTime = deltaTime;
-        }
-        this.vel.add(this.acc.getMult(dTime));
-        this.pos.add(this.vel);
-        this.life--;
-    }
-
-    isDead() : boolean
-    {
-        return this.life <= 0;
-    }
-
-}
+export = Vec2;

@@ -1,8 +1,8 @@
-//import { Particle, Vec2 } from '../tslib/Particles';
-import { Particle } from './tslib/Particles';
 const canvasSketch = require('canvas-sketch');
-//const Particle = require('../tslib/Particles');
+import Particle = require('../tslib/Particle');
+import Vec2 = require('../tslib/Vec2');
 
+let manager;
 
 const settings = {
   duration: 5,
@@ -18,15 +18,29 @@ interface Props {
   playhead: number;
 }
 
-let particle_nbr = 500;
-let particles :Array<Particle.Particle> = new Array<Particle.Particle>();
+// const init = async (canvas_width : number, canvas_height : number) => {
+//   for( let i = 0; i < particle_nbr; i++)
+//   {
+//     let p = new Particle(new Vec2(Math.random() * canvas_width, Math.random() * canvas_height));
+//     ps.push(p);
+//   }
+// }
+
+const particle_nbr = 1;
+const ps : Array<Particle> = new Array<Particle>();
+// let v : Vide;
+
+// v = new Vide(10);
+
+for( let i = 0; i < particle_nbr; i++)
+  {
+    let p = new Particle(new Vec2(Math.random() * 215, Math.random() * 215));
+    ps.push(p);
+  }
 
 const sketch = ({ context, width, height, playhead }: Props) => {
 
-  for( let i = 10; i < particle_nbr; i++)
-  {
-    particles.push( new Particle( new Particle.Vec2(Math.random() * width, Math.random() * height)) );
-  }
+  //init(width, height);
 
   return ({ context, width, height, playhead }: Props) => {
     context.fillStyle = 'hsl(0, 0%, 95%)';
@@ -49,4 +63,9 @@ const sketch = ({ context, width, height, playhead }: Props) => {
   };
 };
 
-canvasSketch(sketch, settings);
+const start = async () => {
+  const manager =  await canvasSketch(sketch, settings);
+}
+
+start();
+
